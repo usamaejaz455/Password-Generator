@@ -1,10 +1,12 @@
 import { useState, useCallback } from 'react';
+import '@fortawesome/fontawesome-free/css/all.min.css'; 
 
 const App = () => {
   const [length, setLength] = useState(8);
   const [numAllowed, setNumAllowed] = useState(false);
   const [charAllowed, setCharAllowed] = useState(false);
   const [password, setPassword] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const passwordGenerator = useCallback(() => {
     let pass = '';
@@ -19,7 +21,22 @@ const App = () => {
     }
 
     setPassword(pass);
+    setCopied(false); 
   }, [length, numAllowed, charAllowed]);
+
+  const copyToClipboard = () => {
+    if (password) {
+      navigator.clipboard.writeText(password).then(
+        () => {
+          setCopied(true); 
+          setTimeout(() => setCopied(false), 2000); 
+        },
+        (err) => {
+          console.error('Failed to copy text: ', err);
+        }
+      );
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
@@ -69,9 +86,20 @@ const App = () => {
         
         <div className="mt-6">
           <h2 className="text-lg font-medium text-gray-700">Generated Password:</h2>
-          <p className="mt-2 p-4 border border-gray-300 rounded bg-gray-50 text-gray-800 text-center font-mono">
-            {password || "Your password will appear here"}
-          </p>
+          <div className="flex items-center justify-between mt-2 p-4 border border-gray-300 rounded bg-gray-50 text-gray-800 font-mono">
+            <span>{password || "Your password will appear here"}</span>
+            <button
+              onClick={copyToClipboard}
+              className={`bg-gray-200 text-gray-600 py-1 px-3 rounded hover:bg-gray-300 transition duration-300 ${copied ? "text-green-500" : ""}`}
+              aria-label="Copy to clipboard"
+            >
+              {copied ? (
+                <i className="fas fa-check-circle"></i> 
+              ) : (
+                <i className="fas fa-copy"></i> 
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
